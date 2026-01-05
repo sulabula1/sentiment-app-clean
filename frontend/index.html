@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analiza Sentymentu</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 40px;
+      background: #f5f6fa;
+      color: #333;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+
+    select, button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    select {
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0078d7;
+      color: white;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sentiment {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .confidence {
+      color: #555;
+    }
+
+    .bar {
+      height: 18px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      transition: width 0.5s;
+    }
+
+    .pos { background: #4CAF50; }
+    .neu { background: #FDD835; }
+    .neg { background: #E53935; }
+  </style>
+</head>
+<body>
+  <h1>Analiza Sentymentu (TF-IDF vs HerBERT)</h1>
+
+  <textarea id="text" placeholder="Wpisz swoją opinię..."></textarea><br><br>
+
+  <label for="model">Wybierz model:</label>
+  <select id="model">
+    <option value="tfidf">TF-IDF (klasyczny)</option>
+    <option value="herbert">HerBERT (transformer)</option>
+  </select>
+  <button id="btn">Analizuj</button>
+
+  <div id="result"></div>
+
+  <script>
+    const API = "http://127.0.0.1:8000/analyze";
+
+    document.getElementById("btn").onclick = async () => {
+      const text = document.getElementById("text").value.trim();
+      const model = document.getElementById("model").value;
+
+      if (!text) {
+        alert("Wpisz tekst do analizy!");
+        return;
+      }
+
+      document.getElementById("result").innerHTML = "<p>Analizuję tekst...</p>";
+
+      try {
+        const response = await fetch(`${API}?model=${model}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        if (!response.ok) throw new Error("Błąd połączenia z API");
+
+        const data = await response.json();
+
+        // Wyświetlenie wyniku
+        const probs = data.probs || {};
+        let bars = "";
+
+        for (const [label, prob] of Object.entries(probs)) {
+          const percent = (prob * 100).toFixed(1);
+          const color =
+            label === "pozytywny" ? "pos" :
+            label === "neutralny" ? "neu" : "neg";
+          bars += `
+            <div>
+              <strong>${label}</strong> (${percent}%)
+              <div class="bar ${color}" style="width: ${percent}%;"></div>
+            </div>`;
+        }
+
+        const color =
+          data.sentiment === "pozytywny" ? "#4CAF50" :
+          data.sentiment === "neutralny" ? "#FDD835" :
+          "#E53935";
+
+        document.getElementById("result").innerHTML = `
+          <div class="sentiment" style="color:${color}">
+             Model: <b>${data.model.toUpperCase()}</b><br>
+             Wynik: ${data.sentiment} (${(data.confidence * 100).toFixed(1)}%)
+          </div>
+          <hr>
+          <div class="confidence">${bars}</div>
+        `;
+      } catch (err) {
+        document.getElementById("result").innerHTML = `
+          <p style="color:red;">❌ Wystąpił błąd: ${err.message}</p>`;
+      }
+    };
+  </script>
+</body>
+</html>

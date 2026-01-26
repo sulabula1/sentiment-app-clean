@@ -1,5 +1,11 @@
 # Aplikacja webowa do analizy sentymentu opinii (TF-IDF vs HerBERT)
 
+**Projekt pracy inżynierskiej – wersja finalna.**  
+Repozytorium zawiera kod źródłowy aplikacji webowej stanowiącej część praktyczną pracy inżynierskiej.  
+Projekt został udostępniony w formie repozytorium GitHub ze względu na rozmiar przekraczający 600 MB oraz konieczność zachowania pełnej struktury, zależności i historii zmian. Wytrenowane modele oraz dane nie są dołączone (limity GitHub / ograniczenia licencyjne).
+
+---
+
 Repozytorium zawiera aplikację webową służącą do analizy sentymentu opinii w języku polskim.  
 System umożliwia wybór metody klasyfikacji:
 - **TF-IDF + klasyfikator** (model klasyczny, szybki),
@@ -133,9 +139,10 @@ curl -X POST "http://127.0.0.1:8000/analyze?model=herbert" \
 
 ## Informacje końcowe 
 
-Projekt został zrealizowany w celach edukacyjnych jako część pracy inżynierskiej.
-Repozytorium prezentuje architekturę aplikacji webowej oraz sposób integracji metod sztucznej inteligencji z technologiami webowymi.
+Projekt został zrealizowany w ramach pracy inżynierskiej jako jej część praktyczna.  
+Repozytorium prezentuje architekturę aplikacji webowej oraz sposób integracji klasycznych
+i transformerowych metod przetwarzania języka naturalnego z technologiami webowymi.
 
-
+**Oddawana wersja projektu:** branch `main` 26.01.2026.
 
   
